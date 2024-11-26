@@ -1,16 +1,42 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"event-booking-api/models"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
 
 func main() {
 	server := gin.Default()
 
-	server.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World",
-		})
-	})
+	server.GET("/events", getEvents)
+	server.POST("/events", createEvent)
 
-	server.Run()
+	server.Run(
+		":4001",
+	)
+}
 
+func getEvents(c *gin.Context) {
+	events := models.GetAllEvents()
+	c.JSON(200, events)
+}
+
+func createEvent(c *gin.Context) {
+	var event models.Event
+
+	if err := c.ShouldBindJSON(&event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	event.ID = len(models.GetAllEvents()) + 1
+	event.DateTime = time.Now()
+	event.UserID = int(uuid.New().ID())
+
+	event.Save()
+	c.JSON(200, event)
 }
