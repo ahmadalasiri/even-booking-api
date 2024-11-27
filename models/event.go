@@ -58,3 +58,19 @@ func GetEvents() ([]Event, error) {
 
 	return events, nil
 }
+
+func GetEvent(id string) (Event, error) {
+	query := `SELECT * FROM events WHERE id = $1`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return Event{}, err
+	}
+	defer stmt.Close()
+
+	var event Event
+	err = stmt.QueryRow(id).Scan(&event.ID, &event.Name, &event.DateTime, &event.UserID)
+	if err != nil {
+		return Event{}, err
+	}
+	return event, nil
+}
