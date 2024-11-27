@@ -1,20 +1,60 @@
 package models
 
-import "time"
+import (
+	"event-booking-api/db"
+	"time"
+)
 
 type Event struct {
 	ID       int
-	Name     string `binding:"required" json:"name"`
+	Name     string `binding:"required"`
 	DateTime time.Time
-	UserID   int
+	UserID   int `binding:"required"`
 }
 
-var events []Event = []Event{}
+func (e Event) Save() (Event, error) {
+	query := `
+		INSERT INTO events (name, user_id)
+		VALUES ($1, $2)
+		RETURNING id, name, date_time, user_id
+	`
+	stmt, err := db.DB.Prepare(query)
 
-func (e Event) Save() {
-	events = append(events, e) // TODO: save to database
+	if err != nil {
+		return Event{}, err
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(e.Name, e.UserID).Scan(&e.ID, &e.Name, &e.DateTime, &e.UserID)
+
+	if err != nil {
+		return Event{}, err
+	}
+
+	return e, nil
+
 }
 
-func GetAllEvents() []Event {
-	return events
+func GetEvents() ([]Event, error) {
+	query := `SELECT * FROM events`
+	rows, err := db.DB.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var events []Event
+
+	for rows.Next() {
+		var event Event
+		err := rows.Scan(&event.ID, &event.Name, &event.DateTime, &event.UserID)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	return events, nil
 }

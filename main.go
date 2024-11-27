@@ -4,10 +4,8 @@ import (
 	"event-booking-api/db"
 	"event-booking-api/models"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func main() {
@@ -23,7 +21,12 @@ func main() {
 }
 
 func getEvents(c *gin.Context) {
-	events := models.GetAllEvents()
+	events, err := models.GetEvents()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(200, events)
 }
 
@@ -35,10 +38,13 @@ func createEvent(c *gin.Context) {
 		return
 	}
 
-	event.ID = len(models.GetAllEvents()) + 1
-	event.DateTime = time.Now()
-	event.UserID = int(uuid.New().ID())
+	createdEvent, err := event.Save()
 
-	event.Save()
-	c.JSON(200, event)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdEvent)
+
 }

@@ -2,5 +2,6 @@ POST http://localhost:4001/events
 content-type: application/json
 
 {
-  "name": "Event 1"
+  "name": "Event 2",
+  "UserId": 2
 }
