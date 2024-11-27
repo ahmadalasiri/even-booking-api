@@ -42,19 +42,35 @@ func InitDB() {
 }
 
 func createTable() {
+
+	createUsersTable := `
+		CREATE TABLE IF NOT EXISTS users (
+			id SERIAL PRIMARY KEY,
+			email TEXT NOT NULL UNIQUE,
+			password TEXT NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)
+	`
+
+	_, err := DB.Exec(createUsersTable)
+	if err != nil {
+		panic(fmt.Sprintf("Error creating table: %v", err))
+	}
+
 	createEventsTable := `
 		CREATE TABLE IF NOT EXISTS events (
 			id SERIAL PRIMARY KEY,
 			name TEXT NOT NULL,
 			date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			user_id INTEGER NOT NULL
+			user_id INTEGER NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		)
 	`
 
-	_, err := DB.Exec(createEventsTable)
+	_, err = DB.Exec(createEventsTable)
 	if err != nil {
 		panic(fmt.Sprintf("Error creating table: %v", err))
 	}
 
-	fmt.Println("Events table created or already exists.")
+	fmt.Println("Tables created!")
 }
