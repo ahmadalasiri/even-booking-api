@@ -53,3 +53,18 @@ func (u User) ValidateCredentials() error {
 
 	return nil
 }
+
+func (u User) FindByEmail() (User, error) {
+	query := `
+		SELECT id, email
+		FROM users
+		WHERE email = $1
+	`
+	var user User
+	err := db.DB.QueryRow(query, u.Email).Scan(&user.ID, &user.Email)
+	if err != nil {
+		return User{}, err
+	}
+
+	return user, nil
+}

@@ -1,7 +1,8 @@
 POST http://localhost:4001/events
 content-type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3Q1QHRlc3QuY29tIiwiZXhwIjoxNzMyODMyNjc1LCJ1c2VySWQiOjd9.Fd3JRJde_6cv-tBMYIobYagLbU8q2U4Soe4ACqlzGYM
+
 
 {
-  "name": "Event 2",
-  "UserId": 2
+  "name": "Event 2"
 }

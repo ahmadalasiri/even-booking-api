@@ -39,6 +39,12 @@ func login(router *gin.Context) {
 		return
 	}
 
+	user, err = user.FindByEmail()
+	if err != nil {
+		router.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	token, err := utils.GenerateToken(user.Email, user.ID)
 
 	if err != nil {

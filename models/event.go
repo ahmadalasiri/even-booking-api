@@ -9,7 +9,7 @@ type Event struct {
 	ID       int
 	Name     string `binding:"required"`
 	DateTime time.Time
-	UserID   int `binding:"required"`
+	UserID   int
 }
 
 func (e Event) Save() (Event, error) {
