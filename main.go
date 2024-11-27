@@ -1,6 +1,7 @@
 package main
 
 import (
+	"event-booking-api/db"
 	"event-booking-api/models"
 	"net/http"
 	"time"
@@ -10,6 +11,7 @@ import (
 )
 
 func main() {
+	db.InitDB()
 	server := gin.Default()
 
 	server.GET("/events", getEvents)
