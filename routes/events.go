@@ -47,3 +47,50 @@ func createEvent(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdEvent)
 
 }
+
+func updateEvent(c *gin.Context) {
+	id := c.Param("id")
+
+	var event models.Event
+
+	_, err := models.GetEvent(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedEvent, err := event.UpdateEvent(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedEvent)
+}
+
+func deleteEvent(c *gin.Context) {
+	id := c.Param("id")
+
+	_, err := models.GetEvent(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = models.DeleteEvent(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
+}

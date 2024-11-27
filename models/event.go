@@ -74,3 +74,38 @@ func GetEvent(id string) (Event, error) {
 	}
 	return event, nil
 }
+
+func (e Event) UpdateEvent(id string) (Event, error) {
+	query := `
+		UPDATE events
+		SET name = $1, user_id = $2
+		WHERE id = $3
+		RETURNING id, name, date_time, user_id
+	`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return Event{}, err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(e.Name, e.UserID, id).Scan(&e.ID, &e.Name, &e.DateTime, &e.UserID)
+	if err != nil {
+		return Event{}, err
+	}
+	return e, nil
+}
+
+func DeleteEvent(id string) error {
+	query := `DELETE FROM events WHERE id = $1`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -1,0 +1,4 @@
+PUT  http://localhost:4001/events/3
+content-type: application/json
+
+{ "name": "event3",  "UserID": 321 }
