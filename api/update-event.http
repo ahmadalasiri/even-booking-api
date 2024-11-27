@@ -1,4 +1,6 @@
-PUT  http://localhost:4001/events/3
+PUT  http://localhost:4001/events/11
 content-type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3Q1QHRlc3QuY29tIiwiZXhwIjoxNzMyODM2NTYwLCJ1c2VySWQiOjd9.rGTuPxri-6alYH5OdyetsWRQ0I4nmHyTBj4Hubzyhoc
 
-{ "name": "event3",  "UserID": 321 }
+
+{ "name": "event11" }

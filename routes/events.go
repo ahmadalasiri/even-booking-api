@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"event-booking-api/middlewares"
 	"event-booking-api/models"
 	"event-booking-api/utils"
 	"net/http"
@@ -65,13 +66,29 @@ func createEvent(c *gin.Context) {
 
 func updateEvent(c *gin.Context) {
 	id := c.Param("id")
-
 	var event models.Event
 
-	_, err := models.GetEvent(id)
+	userValue, ok := c.Get("user")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
 
+	// Type assert to middlewares.User
+	user, ok := userValue.(middlewares.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
+		return
+	}
+
+	event, err := models.GetEvent(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if event.UserID != user.UserID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Not authorized to update this event"})
 		return
 	}
 
@@ -81,7 +98,6 @@ func updateEvent(c *gin.Context) {
 	}
 
 	updatedEvent, err := event.UpdateEvent(id)
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -93,10 +109,28 @@ func updateEvent(c *gin.Context) {
 func deleteEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	_, err := models.GetEvent(id)
+	userValue, ok := c.Get("user")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Type assert to middlewares.User
+	user, ok := userValue.(middlewares.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user type"})
+		return
+	}
+
+	event, err := models.GetEvent(id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if event.UserID != user.UserID {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 

@@ -78,8 +78,8 @@ func GetEvent(id string) (Event, error) {
 func (e Event) UpdateEvent(id string) (Event, error) {
 	query := `
 		UPDATE events
-		SET name = $1, user_id = $2
-		WHERE id = $3
+		SET name = $1
+		WHERE id = $2
 		RETURNING id, name, date_time, user_id
 	`
 	stmt, err := db.DB.Prepare(query)
@@ -88,7 +88,7 @@ func (e Event) UpdateEvent(id string) (Event, error) {
 	}
 	defer stmt.Close()
 
-	err = stmt.QueryRow(e.Name, e.UserID, id).Scan(&e.ID, &e.Name, &e.DateTime, &e.UserID)
+	err = stmt.QueryRow(e.Name, id).Scan(&e.ID, &e.Name, &e.DateTime, &e.UserID)
 	if err != nil {
 		return Event{}, err
 	}
