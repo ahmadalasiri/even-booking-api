@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"event-booking-api/db"
 	"event-booking-api/utils"
 )
@@ -31,4 +32,24 @@ func (u User) Save() (User, error) {
 	}
 
 	return user, nil
+}
+
+func (u User) ValidateCredentials() error {
+	query := `
+		SELECT id, email, password
+		FROM users
+		WHERE email = $1
+	`
+	var user User
+	err := db.DB.QueryRow(query, u.Email).Scan(&user.ID, &user.Email, &user.Password)
+	if err != nil {
+		return err
+	}
+
+	isValidPassword := utils.ComparePasswords(user.Password, u.Password)
+	if !isValidPassword {
+		return errors.New("invalid credentials")
+	}
+
+	return nil
 }
